@@ -15,8 +15,11 @@ Read the data for January. How many columns are there?
 * 16
 * 17
 * 18
-* 19
+* 19   * 
 
+
+code: print(df.shape)
+(2463931, 19)
 
 ## Q2. Computing duration
 
@@ -25,10 +28,19 @@ Now let's compute the `duration` variable. It should contain the duration of a r
 What's the standard deviation of the trips duration in January?
 
 * 41.45
-* 46.45
+* 46.45   *
 * 51.45
 * 56.45
 
+
+code:
+```python
+df['duration'] = df.tpep_dropoff_datetime - df.tpep_pickup_datetime
+df.duration = df.duration.apply(lambda td: td.total_seconds() / 60)
+
+# Statistic 
+print(df.duration.std())
+```
 
 ## Q3. Dropping outliers
 
@@ -39,7 +51,14 @@ What fraction of the records left after you dropped the outliers?
 * 90%
 * 92%
 * 95%
-* 98%
+* 98%   *
+
+Code:
+```python
+# Dropping outliers
+df_clean = df[(df.duration >= 1) & (df.duration <= 60)]
+print(df_clean.shape[0]/df.shape[0])
+```
 
 
 ## Q4. One-hot encoding
@@ -55,9 +74,22 @@ What's the dimensionality of this matrix (number of columns)?
 * 2
 * 155
 * 345
-* 515
+* 515    * 
 * 715
 
+
+Code:
+```python
+# One-hot encoding
+categorical = ['PULocationID', 'DOLocationID']
+
+df[categorical] = df[categorical].astype(str)
+
+train_dicts = df[categorical].to_dict(orient='records')
+
+dv = DictVectorizer()
+print(len(dv.feature_names_))
+```
 
 ## Q5. Training a model
 
@@ -68,10 +100,24 @@ Now let's use the feature matrix from the previous step to train a model.
 
 What's the RMSE on train?
 
-* 6.99
+* 6.99   * 
 * 11.99
 * 16.99
 * 21.99
+
+```python
+X_train = dv.fit_transform(train_dicts)
+
+target = 'duration'
+y_train = df[target].values
+
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+y_pred = lr.predict(X_train)
+
+print(mean_squared_error(y_train, y_pred, squared=False))
+```
 
 
 ## Q6. Evaluating the model
@@ -80,10 +126,22 @@ Now let's apply this model to the validation dataset (February 2022).
 
 What's the RMSE on validation?
 
-* 7.79
+* 7.79   * 
 * 12.79
 * 17.79
 * 22.79
+
+Code:
+```python
+val_dicts = df_val[categorical].to_dict(orient='records')
+X_val = dv.transform(val_dicts)
+y_val = df_val[target].values
+
+y_pred = lr.predict(X_val)
+
+print(mean_squared_error(y_val, y_pred, squared=False))
+
+```
 
 ## Submit the results
 
