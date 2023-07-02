@@ -58,7 +58,8 @@ What is the maximum value of metric `quantile = 0.5` on th `"fare_amount"` colum
 * 14.8
 
 
-![monitoring visualization](.images/homework5.png)
+
+[![Grafana](.images/homework5.png)]()
 
 ## Q5. Dashboard
 
